@@ -1,11 +1,22 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-export default function CreateBlog() {
+export default function EditBlog() {
+    const [blog, setBlog] = useState(null);
+    const params = useParams();
+
+    const {
+        register,
+        handleSubmit,
+        watch,
+        reset,
+        formState: { errors },
+    } = useForm();
+
     const [description, setDescription] = useState("");
     const Navigate = useNavigate();
 
@@ -13,12 +24,13 @@ export default function CreateBlog() {
         setDescription(value);
     };
 
-    const {
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors },
-    } = useForm();
+    const fetchBlog = async () => {
+        const response = await fetch(`http://127.0.0.1:8000/api/blog/${params.id}`);
+        const result = await response.json();
+        setBlog(result.data);
+        setDescription(result.data.description);
+        reset(result.data);
+    };
 
     const formSubmit = async (data) => {
         const formData = new FormData();
@@ -29,7 +41,7 @@ export default function CreateBlog() {
         formData.append("image", data.image[0]);
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/create-blog", {
+            const response = await fetch("http://127.0.0.1:8000/api/update-blog/" + params.id, {
                 method: "POST",
                 body: formData,
             });
@@ -37,20 +49,24 @@ export default function CreateBlog() {
             const result = await response.json();
 
             if (response.ok) {
-                toast("Blog created successfully!");
+                toast("Blog Updated successfully!");
                 Navigate('/');
             } else {
                 toast.error(result.message || "An error occurred.");
             }
         } catch (error) {
-            toast.error("Failed to create the blog. Please try again.");
+            toast.error("Failed to update the blog. Please try again.");
         }
     };
+
+    useEffect(() => {
+        fetchBlog();
+    }, []);
 
     return (
         <div className="container">
             <div className="d-flex justify-content-between mt-5 mb-3">
-                <h4>Create Blog</h4>
+                <h4>Update Blog</h4>
                 <Link to="/" className="btn btn-dark">
                     Back
                 </Link>
@@ -128,6 +144,9 @@ export default function CreateBlog() {
                                 type="file"
                                 className={`form-control ${errors.image && 'is-invalid'}`}
                             />
+                            {
+                                blog && blog.image && <img src={blog.image} alt={blog.image} className='w-25 h-25' />
+                            }
 
                             {errors.image && <p className="invalid-feedback">Blog Image field is required</p>}
                         </div>
@@ -150,5 +169,5 @@ export default function CreateBlog() {
                 </form>
             </div>
         </div>
-    );
+    )
 }
