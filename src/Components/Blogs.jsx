@@ -25,8 +25,8 @@ export default function Blogs() {
                 </div>
                 <div className="row">
                     {
-                        (blogs) && blogs.map((blog,index) => {
-                            return (<BlogCards key={index} blog={blog} />)
+                        (blogs) && blogs.map((blog) => {
+                            return (<BlogCards key={blog.id} blog={blog} />)
                         })
                     }
                 </div>
