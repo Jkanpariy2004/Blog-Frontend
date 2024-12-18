@@ -140,7 +140,7 @@ export default function EditBlog() {
                                 Image
                             </label>
                             <input
-                                {...register('image', { required: true })}
+                                {...register('image')}
                                 type="file"
                                 className={`form-control ${errors.image && 'is-invalid'}`}
                             />
@@ -163,7 +163,7 @@ export default function EditBlog() {
                             {errors.auther && <p className="invalid-feedback">Auther field is required</p>}
                         </div>
                         <div>
-                            <button className="btn btn-dark w-100">Create Blog</button>
+                            <button className="btn btn-dark w-100">Update Blog</button>
                         </div>
                     </div>
                 </form>
